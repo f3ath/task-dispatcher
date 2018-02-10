@@ -1,4 +1,4 @@
-import { TestRun, TestRunResult, TestRunStatus } from '../src/test-run';
+import { TestRun, TestRunResult, TestRunStatus } from '../../src/test-run';
 
 export class MockRun implements TestRun {
   constructor(private status: TestRunStatus, private runtime: number, private result?: TestRunResult) {

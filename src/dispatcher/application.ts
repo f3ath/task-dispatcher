@@ -1,6 +1,7 @@
 import { TestModule } from '../test-module';
-import { ControlledTestRun, TestRun, TestRunStatus } from '../test-run';
-import { MockExecutor } from '../../spec/mock-executor';
+import { TestRun, TestRunStatus } from '../test-run';
+import { MockExecutor } from '../../spec/mocks/mock-executor';
+import { ControlledTestRun } from '../controlled-test-run';
 
 export interface RunRepository {
   register(run: TestRun): string;

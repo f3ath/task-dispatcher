@@ -3,7 +3,7 @@ export interface Process {
 
   toRuntime(): number;
 
-  onStart(start: () => {}): void;
+  onStart(start: () => void): void;
 
-  onExit(exit: (code: number, stdout: string, stderr: string) => {}): void;
+  onExit(exit: (code: number, stdout: string, stderr: string) => void): void;
 }

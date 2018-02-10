@@ -1,9 +1,9 @@
 import { Application, NotFound } from '../src/dispatcher/application';
 import { TestModule } from '../src/test-module';
-import { MockRepo } from './mock-repo';
-import { MockRun } from './mock-run';
-import { MockExecutor } from './mock-executor';
-import { MockProcess } from './mock-process';
+import { MockRepo } from './mocks/mock-repo';
+import { MockRun } from './mocks/mock-run';
+import { MockExecutor } from './mocks/mock-executor';
+import { MockProcess } from './mocks/mock-process';
 
 describe('Application', () => {
   let app: Application;

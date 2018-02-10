@@ -1,5 +1,3 @@
-import { Process } from './process';
-
 export type TestRunStatus = 'scheduled' | 'active' | 'completed' | 'cancelled';
 
 export interface TestRun {
@@ -22,24 +20,3 @@ export class TestRunResult {
   }
 }
 
-export class ControlledTestRun implements TestRun {
-
-  constructor(private readonly proc: Process) {
-
-  }
-
-  toStatus(): TestRunStatus {
-    return 'scheduled';
-  }
-
-  toRuntime(): number {
-    return 0
-  }
-
-  toResult() {
-    return undefined;
-  }
-
-  cancel(): void {
-  }
-}
