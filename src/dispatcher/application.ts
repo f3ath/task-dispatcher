@@ -17,7 +17,7 @@ export interface TestRunDTO {
   readonly errors?: string[];
 }
 
-export class App {
+export class Application {
   constructor(private readonly module: TestModule,
               private readonly repo: RunRepository,
               private readonly executor: MockExecutor) {

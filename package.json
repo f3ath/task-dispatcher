@@ -1,0 +1,28 @@
+{
+  "name": "task-dispatcher",
+  "version": "1.0.0",
+  "description": "Simple Nodejs task dispatcher",
+  "main": "index.ts",
+  "scripts": {
+    "test": "jasmine-ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/f3ath/task-dispatcher.git"
+  },
+  "author": "f3ath",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/f3ath/task-dispatcher/issues"
+  },
+  "homepage": "https://github.com/f3ath/task-dispatcher#readme",
+  "dependencies": {
+    "ts-node": "^4.1.0",
+    "typescript": "^2.7.1"
+  },
+  "devDependencies": {
+    "@types/jasmine": "^2.8.6",
+    "@types/node": "^9.4.4",
+    "jasmine-ts": "^0.2.1"
+  }
+}

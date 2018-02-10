@@ -1,4 +1,4 @@
-import { RunRepository } from './app';
+import { RunRepository } from './application';
 import { TestRun } from '../test-run';
 
 export class InMemoryRunRepository implements RunRepository {

@@ -1,4 +1,4 @@
-import { App, NotFound } from '../src/app/app';
+import { Application, NotFound } from '../src/dispatcher/application';
 import { TestModule } from '../src/test-module';
 import { MockRepo } from './mock-repo';
 import { MockRun } from './mock-run';
@@ -6,14 +6,14 @@ import { MockExecutor } from './mock-executor';
 import { MockProcess } from './mock-process';
 
 describe('Application', () => {
-  let app: App;
+  let app: Application;
   let repo: MockRepo;
   let executor: MockExecutor;
 
   beforeEach(() => {
     executor = new MockExecutor();
     repo = new MockRepo();
-    app = new App(new TestModule('my_module_name', ['foo', 'bar']), repo, executor);
+    app = new Application(new TestModule('my_module_name', ['foo', 'bar']), repo, executor);
   });
 
   it('throws an error if test suite is not found', () => {

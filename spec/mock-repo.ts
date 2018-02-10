@@ -1,4 +1,4 @@
-import { RunRepository } from '../src/app/app';
+import { RunRepository } from '../src/dispatcher/application';
 import { ControlledTestRun, TestRun } from '../src/test-run';
 
 export class MockRepo implements RunRepository {
