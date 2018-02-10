@@ -1,5 +1,5 @@
-import { RunRepository } from './application';
-import { Run } from '../test';
+import { RunRepository } from './run-repository';
+import { Run } from '../run';
 
 export class InMemoryRunRepository implements RunRepository {
   private id = 0;

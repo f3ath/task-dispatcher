@@ -1,20 +1,8 @@
-import { Module, Run, RunStatus } from '../test';
-import { Executor } from "../process";
-
-export interface RunRepository {
-  register(run: Run): string;
-
-  getRun(id: string): Run | undefined;
-}
-
-export interface TestRun {
-  readonly status: RunStatus;
-  readonly runtime: number;
-  readonly exitCode?: number;
-  readonly passCount?: number;
-  readonly failCount?: number;
-  readonly errors?: string[];
-}
+import { Run } from '../run';
+import { Executor } from "../process-executor";
+import { Module } from "../module";
+import { TestRun } from "./test-run";
+import { RunRepository } from "./run-repository";
 
 export class Application {
   constructor(private readonly module: Module,

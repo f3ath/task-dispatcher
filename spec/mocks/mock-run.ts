@@ -1,6 +1,5 @@
-import { RunStatus } from '../../src/test';
-import {RunResult} from "../../src/test";
-import {Run} from "../../src/test";
+import { Run, RunStatus } from "../../src/run";
+import { RunResult } from "../../src/run-result";
 
 export class MockRun implements Run {
   constructor(private status: RunStatus, private runtime: number, private result?: RunResult) {

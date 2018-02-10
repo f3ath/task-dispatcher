@@ -1,19 +1,7 @@
-import { ControlledRun, ResultParser, RunResult } from '../src/test';
+import { ResultParser } from '../src/result-parser';
 import { MockProcess } from './mocks/mock-process';
-
-class MockResultParser implements ResultParser {
-  result: RunResult = {
-    exitCode: 0,
-    runtime: 3.14,
-    failCount: 2,
-    passCount: 3,
-    errors: ['crash', 'boom', 'bang']
-  };
-
-  parse(code: number, stdout: string, stderr: string): RunResult {
-    return this.result;
-  }
-}
+import { ControlledRun } from "../src/controlled-run";
+import { MockResultParser } from "./mocks/mock-result-parser";
 
 describe('ControlledRun', () => {
 

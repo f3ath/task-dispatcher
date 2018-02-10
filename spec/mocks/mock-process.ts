@@ -1,8 +1,10 @@
-import { Process } from '../../src/process';
+import { Process } from "../../src/process";
 
 export class MockProcess implements Process {
-  start = () => {};
-  exit = (code: number, stdout: string, stderr: string) => {};
+  start = () => {
+  };
+  exit = (code: number, stdout: string, stderr: string) => {
+  };
   runtime = 0;
 
   terminate(): void {

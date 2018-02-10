@@ -1,6 +1,6 @@
-import { RunRepository } from '../../src/dispatcher/application';
-import { Run } from '../../src/test';
-import { ControlledRun } from '../../src/test';
+import { RunRepository } from "../../src/dispatcher/run-repository";
+import { Run } from "../../src/run";
+import { ControlledRun } from "../../src/controlled-run";
 
 export class MockRepo implements RunRepository {
   run: Run | undefined;
