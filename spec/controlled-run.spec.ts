@@ -1,15 +1,15 @@
-import { ResultParser } from '../src/result-parser';
+import { OutputParser } from '../src/output-parser';
 import { MockProcess } from './mocks/mock-process';
 import { ControlledRun } from "../src/controlled-run";
-import { MockResultParser } from "./mocks/mock-result-parser";
+import { MockOutputParser } from "./mocks/mock-output-parser";
 
 describe('ControlledRun', () => {
 
   let process: MockProcess;
-  let parser: ResultParser;
+  let parser: OutputParser;
   let run: ControlledRun;
   beforeEach(() => {
-    parser = new MockResultParser();
+    parser = new MockOutputParser();
     process = new MockProcess();
     run = new ControlledRun(process, parser);
   });
@@ -49,6 +49,7 @@ describe('ControlledRun', () => {
   it('parses process output', () => {
     process.start();
     process.exit(0, 'std output', 'std errors');
+    process.runtime = 3.14;
     expect(run.toStatus()).toBe('completed');
     expect(run.toRuntime()).toBe(3.14);
   })

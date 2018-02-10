@@ -1,11 +1,11 @@
 import { Executor } from "./process-executor";
-import { ResultParser } from "./result-parser";
+import { OutputParser } from "./output-parser";
 import { ControlledRun } from "./controlled-run";
 
 export class Module {
   constructor(private readonly name: string,
               private readonly suites: string[],
-              private readonly parser: ResultParser) {
+              private readonly parser: OutputParser) {
   }
 
   hasTestSuite(testSuiteName: string): boolean {

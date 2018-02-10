@@ -20,7 +20,12 @@ export class Application {
 
   getTestRun(id: string): TestRun {
     const run = this.getRunOrThrowNotFound(id);
-    return this.createDTO(run);
+    const dto = {
+      status: run.toStatus(),
+      runtime: run.toRuntime(),
+    };
+    const result = run.toResult();
+    return result ? Object.assign(dto, {test: result}) : dto;
   }
 
   private createDTO(run: Run): TestRun {

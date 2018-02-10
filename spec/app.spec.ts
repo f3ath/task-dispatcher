@@ -2,7 +2,7 @@ import { Application, NotFound } from '../src/dispatcher/application';
 import { Module } from '../src/module';
 import { MockExecutor } from './mocks/mock-executor';
 import { MockRun } from "./mocks/mock-run";
-import { MockResultParser } from "./mocks/mock-result-parser";
+import { MockOutputParser } from "./mocks/mock-output-parser";
 import { MockRepo } from "./mocks/mock-repo";
 import { MockProcess } from "./mocks/mock-process";
 
@@ -14,7 +14,7 @@ describe('Application', () => {
   beforeEach(() => {
     executor = new MockExecutor();
     repo = new MockRepo();
-    app = new Application(new Module('my_module_name', ['foo', 'bar'], new MockResultParser()), repo, executor);
+    app = new Application(new Module('my_module_name', ['foo', 'bar'], new MockOutputParser()), repo, executor);
   });
 
   it('throws an error if test suite is not found', () => {
@@ -39,21 +39,20 @@ describe('Application', () => {
       'completed',
       5,
       {
-        runtime: 3.14,
         failCount: 2,
         passCount: 3,
-        exitCode: 0,
         errors: ['crash', 'boom', 'bang']
       }
     );
     expect(app.getTestRun('mock_id'))
       .toEqual({
         status: 'completed',
-        runtime: 3.14,
-        failCount: 2,
-        passCount: 3,
-        exitCode: 0,
-        errors: ['crash', 'boom', 'bang']
+        runtime: 5,
+        test: {
+          passCount: 3,
+          failCount: 2,
+          errors: ['crash', 'boom', 'bang']
+        }
       });
 
     repo.run = new MockRun(
@@ -63,7 +62,7 @@ describe('Application', () => {
     expect(app.getTestRun('mock_id'))
       .toEqual({
         status: 'active',
-        runtime: 3.14,
+        runtime: 3.14
       });
   });
 
