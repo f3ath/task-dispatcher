@@ -1,16 +1,14 @@
-import { TestModule } from '../test-module';
-import { TestRun, TestRunStatus } from '../test-run';
-import { MockExecutor } from '../../spec/mocks/mock-executor';
-import { ControlledTestRun } from '../controlled-test-run';
+import { Module, Run, RunStatus } from '../test';
+import { Executor } from "../process";
 
 export interface RunRepository {
-  register(run: TestRun): string;
+  register(run: Run): string;
 
-  getRun(id: string): TestRun | undefined;
+  getRun(id: string): Run | undefined;
 }
 
-export interface TestRunDTO {
-  readonly status: TestRunStatus;
+export interface TestRun {
+  readonly status: RunStatus;
   readonly runtime: number;
   readonly exitCode?: number;
   readonly passCount?: number;
@@ -19,27 +17,25 @@ export interface TestRunDTO {
 }
 
 export class Application {
-  constructor(private readonly module: TestModule,
+  constructor(private readonly module: Module,
               private readonly repo: RunRepository,
-              private readonly executor: MockExecutor) {
+              private readonly executor: Executor) {
   }
 
   startNewTestRun(suiteName: string): string {
     if (this.module.hasTestSuite(suiteName)) {
-      return this.repo.register(
-        new ControlledTestRun(
-          this.module.runTestSuite(suiteName, this.executor)
-        )
-      );
+      const run = this.module.runTestSuite(suiteName, this.executor);
+      return this.repo.register(run);
     }
     throw new NotFound(suiteName);
   }
 
-  getTestRun(id: string): TestRunDTO {
-    const run = this.repo.getRun(id);
-    if (run === undefined) {
-      throw new NotFound(id);
-    }
+  getTestRun(id: string): TestRun {
+    const run = this.getRunOrThrowNotFound(id);
+    return this.createDTO(run);
+  }
+
+  private createDTO(run: Run): TestRun {
     const dto = {
       status: run.toStatus(),
       runtime: run.toRuntime(),
@@ -49,10 +45,15 @@ export class Application {
   }
 
   cancelTestRun(id: string) {
+    this.getRunOrThrowNotFound(id).cancel();
+  }
+
+  private getRunOrThrowNotFound(id: string): Run {
     const run = this.repo.getRun(id);
     if (run) {
-      run.cancel();
+      return run;
     }
+    throw new NotFound(id);
   }
 }
 

@@ -1,10 +1,12 @@
-import { TestRun, TestRunResult, TestRunStatus } from '../../src/test-run';
+import { RunStatus } from '../../src/test';
+import {RunResult} from "../../src/test";
+import {Run} from "../../src/test";
 
-export class MockRun implements TestRun {
-  constructor(private status: TestRunStatus, private runtime: number, private result?: TestRunResult) {
+export class MockRun implements Run {
+  constructor(private status: RunStatus, private runtime: number, private result?: RunResult) {
   }
 
-  toStatus(): TestRunStatus {
+  toStatus(): RunStatus {
     return this.status;
   }
 
@@ -12,7 +14,7 @@ export class MockRun implements TestRun {
     return this.runtime;
   }
 
-  toResult(): TestRunResult | undefined {
+  toResult(): RunResult | undefined {
     return this.result;
   }
 

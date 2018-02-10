@@ -1,17 +1,17 @@
 import { RunRepository } from './application';
-import { TestRun } from '../test-run';
+import { Run } from '../test';
 
 export class InMemoryRunRepository implements RunRepository {
   private id = 0;
-  private readonly map = new Map<string, TestRun>();
+  private readonly map = new Map<string, Run>();
 
-  register(run: TestRun): string {
+  register(run: Run): string {
     const id = this.nextId();
     this.map.set(id, run);
     return id;
   }
 
-  getRun(id: string): TestRun | undefined {
+  getRun(id: string): Run | undefined {
     return this.map.get(id);
   }
 

@@ -1,16 +1,16 @@
 import { RunRepository } from '../../src/dispatcher/application';
-import { TestRun } from '../../src/test-run';
-import { ControlledTestRun } from '../../src/controlled-test-run';
+import { Run } from '../../src/test';
+import { ControlledRun } from '../../src/test';
 
 export class MockRepo implements RunRepository {
-  run: TestRun | undefined;
+  run: Run | undefined;
 
-  register(run: ControlledTestRun): string {
+  register(run: ControlledRun): string {
     this.run = run;
     return 'mock_id';
   }
 
-  getRun(id: string): TestRun | undefined {
+  getRun(id: string): Run | undefined {
     return (id === 'mock_id') ? this.run : undefined;
   }
 }

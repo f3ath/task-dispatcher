@@ -1,5 +1,5 @@
 import { Application, NotFound } from '../src/dispatcher/application';
-import { TestModule } from '../src/test-module';
+import { Module } from '../src/test';
 import { MockRepo } from './mocks/mock-repo';
 import { MockRun } from './mocks/mock-run';
 import { MockExecutor } from './mocks/mock-executor';
@@ -13,7 +13,7 @@ describe('Application', () => {
   beforeEach(() => {
     executor = new MockExecutor();
     repo = new MockRepo();
-    app = new Application(new TestModule('my_module_name', ['foo', 'bar']), repo, executor);
+    app = new Application(new Module('my_module_name', ['foo', 'bar']), repo, executor);
   });
 
   it('throws an error if test suite is not found', () => {
@@ -71,5 +71,9 @@ describe('Application', () => {
     spyOn(repo.run, 'cancel');
     app.cancelTestRun('mock_id');
     expect(repo.run.cancel).toHaveBeenCalled();
+  });
+
+  it('throws an error if run not found', () => {
+    expect(() => app.cancelTestRun('invalid_id')).toThrow(new NotFound('invalid_id'));
   });
 });

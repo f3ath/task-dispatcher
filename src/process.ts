@@ -7,3 +7,7 @@ export interface Process {
 
   onExit(exit: (code: number, stdout: string, stderr: string) => void): void;
 }
+
+export interface Executor {
+  execute(command: string, args?: string[]): Process;
+}
