@@ -1,6 +1,6 @@
 # Simple node task dispatcher
 ## Install
-I used node v9.5.0, but I hope v8 should be enough. Just run `npm i` to install.
+Just run `npm i` to install. I used node v9.5.0, but I hope v8 should be enough.
 ## The Server
 Run `npm start` to start the dispatcher server on port 4200. The following requests are supported.
 ### Start a new test run
