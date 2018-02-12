@@ -1,5 +1,6 @@
 import { TestModule, TestResult } from "./test";
 import * as cp from 'child_process';
+import { ChildProcess } from 'child_process';
 
 export class NotFound extends Error {
 }
@@ -11,6 +12,59 @@ interface Run {
   finished?: Date;
   result?: TestResult;
   error?: Error;
+}
+
+class LocalRun {
+  private readonly started: Date;
+  private finished?: Date;
+  private result?: TestResult;
+  private error?: Error;
+
+  constructor(private readonly suite: string, private readonly process: ChildProcess) {
+    this.started = new Date();
+  }
+
+  complete(result: TestResult) {
+    this.result = result;
+    this.finish();
+  }
+
+  fail(error: Error) {
+    this.error = error;
+    this.finish();
+  }
+
+  cancel() {
+    this.process.kill();
+  }
+
+  toStatus(): string {
+    if (!this.finished) {
+      return 'active';
+    }
+    if (this.result) {
+      return 'completed';
+    }
+    if (this.process.killed) {
+      return 'cancelled';
+    }
+    return 'error';
+  }
+
+  toSuiteName() {
+    return this.suite;
+  }
+
+  toRuntime() {
+    if (this.finished) {
+      return this.finished.getTime() - this.started.getTime();
+    }
+    return new Date().getTime() - this.started.getTime();
+  }
+
+  private finish() {
+    this.finished = new Date();
+  }
 }
 
 export class Dispatcher {
