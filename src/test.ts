@@ -18,8 +18,9 @@ export interface TestModule {
   decodeResult(stdout: string): TestResult;
 }
 
-export class LocalNodeTestModule implements TestModule {
-  constructor(private readonly name: string, private readonly suites: string[]) {
+export class NodeTestModule implements TestModule {
+  constructor(private readonly name: string,
+              private readonly suites: string[]) {
   }
 
   has(suiteName: string): boolean {

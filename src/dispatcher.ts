@@ -1,91 +1,32 @@
 import { TestModule, TestResult } from "./test";
-import * as cp from 'child_process';
-import { ChildProcess } from 'child_process';
 
 export class NotFound extends Error {
 }
 
-class LocalRun {
-  private readonly started: Date;
-  private readonly process: ChildProcess;
-  private finished?: Date;
-  private result?: TestResult;
-  private error?: Error;
+export interface TestRun {
+  cancel(): void;
 
-  constructor(testModule: TestModule, private readonly suite: string) {
-    const cmd = testModule.makeRunCommand(suite);
-    this.process = cp.execFile(cmd.command, cmd.args, (error, stdout, stderr) => {
-      if (error) {
-        this.fail(error);
-        return;
-      }
-      if (!stdout && stderr) {
-        this.fail(new Error(stderr));
-        return;
-      }
-      try {
-        this.complete(testModule.decodeResult(stdout));
-      } catch (e) {
-        this.fail(e);
-      }
-    });
-    this.started = new Date();
-  }
+  toStatus(): string;
 
-  cancel() {
-    this.process.kill();
-  }
+  toSuiteName(): string;
 
-  toStatus(): string {
-    if (!this.finished) {
-      return 'active';
-    }
-    if (this.result) {
-      return 'completed';
-    }
-    if (this.process.killed) {
-      return 'cancelled';
-    }
-    return 'error';
-  }
+  toError(): void;
 
-  toSuiteName() {
-    return this.suite;
-  }
+  toResult(): void;
 
-  toError() {
-    return this.error;
-  }
-
-  toResult() {
-    return this.result;
-  }
-
-  toRuntime() {
-    return (this.finished || new Date()).getTime() - this.started.getTime();
-  }
-
-  private fail(error: Error) {
-    this.error = error;
-    this.finish();
-  }
-
-  private complete(result: TestResult) {
-    this.result = result;
-    this.finish();
-  }
-
-  private finish() {
-    this.finished = new Date();
-  }
+  toRuntime(): number;
 }
 
+export interface TestRunner {
+  run(m: TestModule, suit: string): TestRun;
+}
 export class Dispatcher {
-  private readonly runList = new Map<string, LocalRun>();
+  private readonly runList = new Map<string, TestRun>();
 
   private nextId = 1;
 
-  constructor(private readonly module: TestModule) {
+  constructor(private readonly module: TestModule,
+              private readonly runner: TestRunner) {
   }
 
   start(suite: string): string {
@@ -94,7 +35,7 @@ export class Dispatcher {
     }
     const id = this.generateId();
 
-    this.runList.set(id, new LocalRun(this.module, suite));
+    this.runList.set(id, this.runner.run(this.module, suite));
     return id;
   }
 

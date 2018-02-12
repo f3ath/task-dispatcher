@@ -1,5 +1,6 @@
 import { Dispatcher, NotFound } from "../src/dispatcher";
-import { LocalNodeTestModule } from "../src/test";
+import { NodeTestModule } from "../src/test";
+import { LocalRunner } from "../src/local-run";
 
 describe('Dispatcher', () => {
   const timeout = 500;
@@ -106,10 +107,11 @@ describe('Dispatcher', () => {
   };
 
   const dispatcher = new Dispatcher(
-    new LocalNodeTestModule(
+    new NodeTestModule(
       [__dirname, 'example-test-module'].join('/'),
       Object.keys(tests)
-    )
+    ),
+    new LocalRunner()
   );
 
   Object.keys(tests)

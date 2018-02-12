@@ -1,13 +1,15 @@
-import { LocalNodeTestModule } from "./src/test";
+import { NodeTestModule } from "./src/test";
 import { Dispatcher, NotFound } from "./src/dispatcher";
 import * as express from 'express';
 import { NextFunction, Request, Response } from 'express';
+import { LocalRunner } from "./src/local-run";
 
 const dispatcher = new Dispatcher(
-  new LocalNodeTestModule(
+  new NodeTestModule(
     [__dirname, '/etc/test-module.js'].join('/'),
     ['testSuite1', 'testSuite2', 'testSuite3', 'testSuite4', 'testSuite5', 'testSuite6', 'testSuite7', 'testSuite8']
-  )
+  ),
+  new LocalRunner()
 );
 const app = express();
 
