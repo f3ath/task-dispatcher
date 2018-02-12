@@ -5,33 +5,31 @@ import { ChildProcess } from 'child_process';
 export class NotFound extends Error {
 }
 
-interface Run {
-  process: cp.ChildProcess;
-  suite: string;
-  started: Date;
-  finished?: Date;
-  result?: TestResult;
-  error?: Error;
-}
-
 class LocalRun {
   private readonly started: Date;
+  private readonly process: ChildProcess;
   private finished?: Date;
   private result?: TestResult;
   private error?: Error;
 
-  constructor(private readonly suite: string, private readonly process: ChildProcess) {
+  constructor(testModule: TestModule, private readonly suite: string) {
+    const cmd = testModule.makeRunCommand(suite);
+    this.process = cp.execFile(cmd.command, cmd.args, (error, stdout, stderr) => {
+      if (error) {
+        this.fail(error);
+        return;
+      }
+      if (!stdout && stderr) {
+        this.fail(new Error(stderr));
+        return;
+      }
+      try {
+        this.complete(testModule.decodeResult(stdout));
+      } catch (e) {
+        this.fail(e);
+      }
+    });
     this.started = new Date();
-  }
-
-  complete(result: TestResult) {
-    this.result = result;
-    this.finish();
-  }
-
-  fail(error: Error) {
-    this.error = error;
-    this.finish();
   }
 
   cancel() {
@@ -55,11 +53,26 @@ class LocalRun {
     return this.suite;
   }
 
+  toError() {
+    return this.error;
+  }
+
+  toResult() {
+    return this.result;
+  }
+
   toRuntime() {
-    if (this.finished) {
-      return this.finished.getTime() - this.started.getTime();
-    }
-    return new Date().getTime() - this.started.getTime();
+    return (this.finished || new Date()).getTime() - this.started.getTime();
+  }
+
+  private fail(error: Error) {
+    this.error = error;
+    this.finish();
+  }
+
+  private complete(result: TestResult) {
+    this.result = result;
+    this.finish();
   }
 
   private finish() {
@@ -68,7 +81,7 @@ class LocalRun {
 }
 
 export class Dispatcher {
-  private readonly runList = new Map<string, Run>();
+  private readonly runList = new Map<string, LocalRun>();
 
   private nextId = 1;
 
@@ -76,71 +89,44 @@ export class Dispatcher {
   }
 
   start(suite: string): string {
-    if (this.module.has(suite)) {
-      const id = this.generateId();
-      const cmd = this.module.makeRunCommand(suite);
-      const process = cp.execFile(cmd.command, cmd.args, (error, stdout, stderr) => {
-        const run = this.runList.get(id)!;
-        run.finished = new Date();
-        if (error) {
-          run.error = error;
-          return;
-        }
-        if (!stdout && stderr) {
-          run.error = new Error(stderr);
-          return;
-        }
-        try {
-          run.result = this.module.decodeResult(stdout);
-        } catch (e) {
-          run.error = e;
-          return;
-        }
-      });
-      this.runList.set(id, {
-        process: process,
-        suite: suite,
-        started: new Date()
-      });
-      return id;
+    if (!this.module.has(suite)) {
+      throw new NotFound(suite);
     }
-    throw new NotFound(suite);
+    const id = this.generateId();
+
+    this.runList.set(id, new LocalRun(this.module, suite));
+    return id;
   }
 
-  getStatus(id: string): { suite: string, status: string, runtime: number, error?: Error, result?: TestResult } {
+  getStatus(id: string): {
+    suite: string, status: string, runtime: number, error ?: Error, result ?: TestResult
+  } {
     const run = this.runList.get(id);
     if (run === undefined) {
       throw new NotFound(id);
     }
-    if (run.error) {
-      return {
-        suite: run.suite,
-        status: run.process.killed ? 'cancelled' : 'error',
-        runtime: run.finished!.getTime() - run.started.getTime(),
-        error: run.error
-      }
+    const dto = {
+      suite: run.toSuiteName(),
+      status: run.toStatus(),
+      runtime: run.toRuntime()
+    };
+    const error = run.toError();
+    if (error) {
+      return Object.assign(dto, {error: error});
     }
-    if (run.result) {
-      return {
-        suite: run.suite,
-        status: 'completed',
-        runtime: run.finished!.getTime() - run.started.getTime(),
-        result: run.result
-      }
+    const result = run.toResult();
+    if (result) {
+      return Object.assign(dto, {result: result});
     }
-    return {
-      suite: run.suite,
-      status: 'active',
-      runtime: (new Date()).getTime() - run.started.getTime()
-    }
+    return dto;
   }
 
-  cancel(id: string) {
-    const run = this.runList.get(id);
+  cancel(run_id: string) {
+    const run = this.runList.get(run_id);
     if (!run) {
-      throw new NotFound(id);
+      throw new NotFound(run_id);
     }
-    run.process.kill();
+    run.cancel();
   }
 
   private generateId(): string {
