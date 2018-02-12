@@ -40,7 +40,7 @@ function printPassFailCount(numPassed, numFailed, testFailures) {
 const testSuiteDefs = {
   testSuite1: {
     fn: () => printPassFailCount(10, 0),
-    runtime: 5 * 1000
+    runtime: 100
   },
   testSuite2: {
     failureCount: 5,
@@ -48,7 +48,7 @@ const testSuiteDefs = {
       new TestFailure('\'UsernameCannotExceed64Bytes\'', 'TestAssertionException', 'Profile creation succeeded, but should have failed'),
       new TestFailure('\'ModifyUsernameForExistingProfile\'', 'ArrayIndexOutOfBoundsException', 'Index: 2 Length: 2')
     ]),
-    runtime: 5 * 1000
+    runtime: 100
   },
   testSuite3: {
     fn: () => printPassFailCount(0, 6, [
@@ -59,20 +59,20 @@ const testSuiteDefs = {
       new TestFailure('\'RecalcSocialGraphSparseUserTable\'', 'DbConnectionException', 'Failed to establish socket connection to magnetoDb (127.0.0.1:5121)'),
       new TestFailure('\'RecalcSocialGraphFullUserTable\'', 'DbConnectionException', 'Failed to establish socket connection to magnetoDb (127.0.0.1:5121)')
     ]),
-    runtime: 5 * 1000
+    runtime: 100
   },
   testSuite4: {
     fn: () => printPassFailCount(9, 1, [
       new TestFailure('\'InitializeWithEmptyUserTable\'', 'TimeoutException', 'Test ran longer than 60000ms')
     ]),
-    runtime: 60 * 1000
+    runtime: 100
   },
   testSuite5: {
     fn: () => {
       const BlinkmothApi = {};
       BlinkmothApi.disconnect();
     },
-    runtime: 2 * 1000
+    runtime: 100
   },
   testSuite6: {
     fn: () => {
@@ -83,15 +83,15 @@ const testSuiteDefs = {
         console.error(`Unable to initialize test 'ReindexGraphTable':\n${e.stack}`);
       }
     },
-    runtime: 2 * 1000
+    runtime: 100
   },
   testSuite7: {
     fn: () => printPassFailCount(0, 0),
-    runtime: 2 * 1000
+    runtime: 1000
   },
   testSuite8: {
     fn: () => printPassFailCount(5, 1),
-    runtime: 3 * 1000
+    runtime: 100
   }
 }
 
