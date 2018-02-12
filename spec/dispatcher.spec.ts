@@ -1,5 +1,5 @@
 import { Dispatcher, NotFound } from "../src/dispatcher";
-import { NodeTestModule } from "../src/test";
+import { LocalNodeTestModule } from "../src/test";
 
 describe('Dispatcher', () => {
   const timeout = 500;
@@ -7,6 +7,7 @@ describe('Dispatcher', () => {
     'testSuite1': (id: string) => (done: () => any) => {
       setTimeout(() => {
         const run = dispatcher.getStatus(id);
+        expect(run.suite).toEqual('testSuite1');
         expect(run.status).toEqual('completed');
         expect(run.runtime).toBeGreaterThan(0);
         expect(run.result!.passed).toBe(10);
@@ -19,6 +20,7 @@ describe('Dispatcher', () => {
     'testSuite2': (id: string) => (done: () => any) => {
       setTimeout(() => {
         const run = dispatcher.getStatus(id);
+        expect(run.suite).toEqual('testSuite2');
         expect(run.status).toEqual('completed');
         expect(run.runtime).toBeGreaterThan(0);
         expect(run.result!.passed).toBe(8);
@@ -32,6 +34,7 @@ describe('Dispatcher', () => {
     'testSuite3': (id: string) => (done: () => any) => {
       setTimeout(() => {
         const run = dispatcher.getStatus(id);
+        expect(run.suite).toEqual('testSuite3');
         expect(run.status).toEqual('completed');
         expect(run.runtime).toBeGreaterThan(0);
         expect(run.result!.passed).toBe(0);
@@ -45,6 +48,7 @@ describe('Dispatcher', () => {
     'testSuite4': (id: string) => (done: () => any) => {
       setTimeout(() => {
         const run = dispatcher.getStatus(id);
+        expect(run.suite).toEqual('testSuite4');
         expect(run.status).toEqual('completed');
         expect(run.runtime).toBeGreaterThan(0);
         expect(run.result!.passed).toBe(9);
@@ -57,6 +61,7 @@ describe('Dispatcher', () => {
     'testSuite5': (id: string) => (done: () => any) => {
       setTimeout(() => {
         const run = dispatcher.getStatus(id);
+        expect(run.suite).toEqual('testSuite5');
         expect(run.status).toEqual('error');
         expect(run.runtime).toBeGreaterThan(0);
         expect(run.error!.message).toContain("TypeError: BlinkmothApi.disconnect is not a function");
@@ -67,6 +72,7 @@ describe('Dispatcher', () => {
     'testSuite6': (id: string) => (done: () => any) => {
       setTimeout(() => {
         const run = dispatcher.getStatus(id);
+        expect(run.suite).toEqual('testSuite6');
         expect(run.status).toEqual('error');
         expect(run.runtime).toBeGreaterThan(0);
         expect(run.error!.message).toContain("Unable to initialize test 'ReindexGraphTable'");
@@ -77,6 +83,7 @@ describe('Dispatcher', () => {
     'testSuite7': (id: string) => (done: () => any) => {
       setTimeout(() => {
         const run = dispatcher.getStatus(id);
+        expect(run.suite).toEqual('testSuite7');
         expect(run.status).toEqual('completed');
         expect(run.runtime).toBeGreaterThan(0);
         expect(run.result!.passed).toBe(0);
@@ -88,6 +95,7 @@ describe('Dispatcher', () => {
     'testSuite8': (id: string) => (done: () => any) => {
       setTimeout(() => {
         const run = dispatcher.getStatus(id);
+        expect(run.suite).toEqual('testSuite8');
         expect(run.status).toEqual('completed');
         expect(run.runtime).toBeGreaterThan(0);
         expect(run.result!.passed).toBe(5);
@@ -98,7 +106,7 @@ describe('Dispatcher', () => {
   };
 
   const dispatcher = new Dispatcher(
-    new NodeTestModule(
+    new LocalNodeTestModule(
       [__dirname, 'example-test-module'].join('/'),
       Object.keys(tests)
     )

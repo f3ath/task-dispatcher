@@ -110,7 +110,7 @@ if (testSuite === undefined) {
   const testSuiteList = Object.keys(testSuites).reduce((list, suiteName) => {
     return list + (list.length > 0 ? ', ' : '') + suiteName;
   }, '');
-  console.log(usage + '\navailable results suites:\n\t' + testSuiteList);
+  console.log(usage + '\navailable result suites:\n\t' + testSuiteList);
 } else if (testSuites[testSuite] === undefined) {
   console.log(`${scriptName}: test suite 'testSuite' not recongnized`);
 } else {

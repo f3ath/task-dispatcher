@@ -1,25 +1,20 @@
-import { TestModule } from "./test";
+import { TestModule, TestResult } from "./test";
 import * as cp from 'child_process';
 
 export class NotFound extends Error {
 }
 
-interface Result {
-  passed: number,
-  failed: number,
-  errors: string
-}
-
-type Dated<T> = { date: Date, value: T };
-
-function makeDated<T>(v: T): Dated<T> {
-  return {date: new Date(), value: v};
+interface Run {
+  process: cp.ChildProcess;
+  suite: string;
+  started: Date;
+  finished?: Date;
+  result?: TestResult;
+  error?: Error;
 }
 
 export class Dispatcher {
-  private readonly processList = new Map<string, Dated<cp.ChildProcess>>();
-  private readonly errorList = new Map<string, Dated<Error>>();
-  private readonly resultList = new Map<string, Dated<Result>>();
+  private readonly runList = new Map<string, Run>();
 
   private nextId = 1;
 
@@ -31,61 +26,67 @@ export class Dispatcher {
       const id = this.generateId();
       const cmd = this.module.makeRunCommand(suite);
       const process = cp.execFile(cmd.command, cmd.args, (error, stdout, stderr) => {
+        const run = this.runList.get(id)!;
+        run.finished = new Date();
         if (error) {
-          this.errorList.set(id, makeDated(error));
+          run.error = error;
           return;
         }
         if (!stdout && stderr) {
-          this.errorList.set(id, makeDated(new Error(stderr)));
+          run.error = new Error(stderr);
           return;
         }
         try {
-          const result = this.module.decodeResult(stdout, stderr);
-          this.resultList.set(id, makeDated(result));
+          run.result = this.module.decodeResult(stdout);
         } catch (e) {
-          this.errorList.set(id, makeDated(e));
+          run.error = e;
           return;
         }
       });
-      this.processList.set(id, makeDated(process));
+      this.runList.set(id, {
+        process: process,
+        suite: suite,
+        started: new Date()
+      });
       return id;
     }
     throw new NotFound(suite);
   }
 
-  getStatus(id: string): { status: string, runtime: number, error?: Error, result?: Result } {
-    const run = this.processList.get(id);
+  getStatus(id: string): { suite: string, status: string, runtime: number, error?: Error, result?: TestResult } {
+    const run = this.runList.get(id);
     if (run === undefined) {
       throw new NotFound(id);
     }
-    const error = this.errorList.get(id);
-    if (error) {
+    if (run.error) {
       return {
-        status: run.value.killed ? 'cancelled' : 'error',
-        runtime: error.date.getTime() - run.date.getTime(),
-        error: error.value
+        suite: run.suite,
+        status: run.process.killed ? 'cancelled' : 'error',
+        runtime: run.finished!.getTime() - run.started.getTime(),
+        error: run.error
       }
     }
-    const result = this.resultList.get(id);
-    if (result) {
+    if (run.result) {
       return {
+        suite: run.suite,
         status: 'completed',
-        runtime: result.date.getTime() - run.date.getTime(),
-        result: result.value
+        runtime: run.finished!.getTime() - run.started.getTime(),
+        result: run.result
       }
     }
     return {
+      suite: run.suite,
       status: 'active',
-      runtime: (new Date()).getTime() - run.date.getTime()
+      runtime: (new Date()).getTime() - run.started.getTime()
     }
   }
 
   cancel(id: string) {
-    const proc = this.processList.get(id);
-    if (!proc) {
+    const run = this.runList.get(id);
+    if (!run) {
       throw new NotFound(id);
     }
-    proc.value.kill();
+    run.process.kill();
   }
 
   private generateId(): string {

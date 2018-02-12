@@ -1,4 +1,4 @@
-export interface TestResults {
+export interface TestResult {
   passed: number,
   failed: number,
   errors: string
@@ -15,12 +15,11 @@ export interface TestModule {
 
   makeRunCommand(suite: string): Command;
 
-  decodeResult(stdout: string, stderr: string): TestResults;
+  decodeResult(stdout: string): TestResult;
 }
 
-export class NodeTestModule implements TestModule {
+export class LocalNodeTestModule implements TestModule {
   constructor(private readonly name: string, private readonly suites: string[]) {
-
   }
 
   has(suiteName: string): boolean {
@@ -31,8 +30,8 @@ export class NodeTestModule implements TestModule {
     return new Command('node', [this.name, suiteName]);
   }
 
-  decodeResult(stdout: string, stderr: string): TestResults {
-    const lines = stdout.split('\n').filter(line => line.length > 0);
+  decodeResult(stdout: string): TestResult {
+    const lines = stdout.split('\n').filter(line => line.length);
     const lastLine = lines.pop();
     if (!lastLine) {
       throw new Error('Empty stdout');
