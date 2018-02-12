@@ -24,28 +24,30 @@ app.delete('/run/:id', (req: Request, res: Response) => {
 });
 
 app.get('/run/:id', (req: Request, res: Response) => {
-    const run = dispatcher.getStatus(req.params.id);
-    const dto = {
-      status: run.status,
-      runtime: run.runtime
-    };
-    if (run.result) {
-      res.json(Object.assign(dto, {
-        results: {
-          passed: run.result.passed,
-          failed: run.result.failed,
-          errors: run.result.errors
-        }
-      }))
-    } else if (run.error) {
-      res.json(Object.assign(dto, {
-        message: run.error.message
-      }));
-    } else {
-      res.json(dto);
-    }
+  const id = req.params.id;
+  const run = dispatcher.getStatus(id);
+  const dto = {
+    id: id,
+    suite: run.suite,
+    status: run.status,
+    runtime: run.runtime
+  };
+  if (run.result) {
+    res.json(Object.assign(dto, {
+      results: {
+        passed: run.result.passed,
+        failed: run.result.failed,
+        errors: run.result.errors
+      }
+    }))
+  } else if (run.error && run.status !== 'cancelled') {
+    res.json(Object.assign(dto, {
+      message: run.error.message
+    }));
+  } else {
+    res.json(dto);
   }
-);
+});
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   if (err instanceof NotFound) {
@@ -55,4 +57,5 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   }
 });
 
-app.listen(4200);
+const port = 4200;
+app.listen(port, () => console.log(`Listening as ${port}`));

@@ -20,6 +20,7 @@ export interface TestRun {
 export interface TestRunner {
   run(m: TestModule, suit: string): TestRun;
 }
+
 export class Dispatcher {
   private readonly runList = new Map<string, TestRun>();
 
@@ -29,22 +30,23 @@ export class Dispatcher {
               private readonly runner: TestRunner) {
   }
 
+  /**
+   * Start a new test run, return run id
+   */
   start(suite: string): string {
-    if (!this.module.has(suite)) {
-      throw new NotFound(suite);
+    if (this.module.has(suite)) {
+      return this.startNewRun(suite);
     }
-    const id = this.generateId();
-
-    this.runList.set(id, this.runner.run(this.module, suite));
-    return id;
+    throw new NotFound(suite);
   }
 
-  getStatus(id: string): {
-    suite: string, status: string, runtime: number, error ?: Error, result ?: TestResult
-  } {
-    const run = this.runList.get(id);
-    if (run === undefined) {
-      throw new NotFound(id);
+  /**
+   * Get status of existing test run
+   */
+  getStatus(run_id: string): { suite: string, status: string, runtime: number, error ?: Error, result ?: TestResult } {
+    const run = this.runList.get(run_id);
+    if (!run) {
+      throw new NotFound(run_id);
     }
     const dto = {
       suite: run.toSuiteName(),
@@ -62,12 +64,22 @@ export class Dispatcher {
     return dto;
   }
 
+  /**
+   * Cancel test run
+   */
   cancel(run_id: string) {
     const run = this.runList.get(run_id);
     if (!run) {
       throw new NotFound(run_id);
     }
     run.cancel();
+  }
+
+  private startNewRun(suite: string) {
+    const id = this.generateId();
+    const run = this.runner.run(this.module, suite);
+    this.runList.set(id, run);
+    return id;
   }
 
   private generateId(): string {
