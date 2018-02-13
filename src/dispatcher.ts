@@ -43,10 +43,10 @@ export class Dispatcher {
   /**
    * Get status of existing test run
    */
-  getStatus(run_id: string): { suite: string, status: string, runtime: number, error ?: Error, result ?: TestResult } {
-    const run = this.runList.get(run_id);
+  getStatus(id: string): { suite: string, status: string, runtime: number, error ?: Error, result ?: TestResult } {
+    const run = this.runList.get(id);
     if (!run) {
-      throw new NotFound(run_id);
+      throw new NotFound(id);
     }
     const dto = {
       suite: run.toSuiteName(),
@@ -67,10 +67,10 @@ export class Dispatcher {
   /**
    * Cancel test run
    */
-  cancel(run_id: string) {
-    const run = this.runList.get(run_id);
+  cancel(id: string) {
+    const run = this.runList.get(id);
     if (!run) {
-      throw new NotFound(run_id);
+      throw new NotFound(id);
     }
     run.cancel();
   }
